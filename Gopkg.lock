@@ -2,10 +2,10 @@
 
 
 [[projects]]
+  branch = "master"
   name = "github.com/FactomProject/logrustash"
   packages = ["."]
-  revision = "d55d6adc72cff4345182c78983cf8f42e2bc294d"
-  version = "0.7.0"
+  revision = "9c7278ede46e1ccc03f0b17d6663730c340acb81"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -31,6 +31,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f01cdf15721c3f702c51800417fd301a6ff188d580bce831794557b72b823a5b"
+  inputs-digest = "13a70b8b19494648ee79ee08c693b62d17663ed3ebed9af0ad147790a5fe4f2f"
   solver-name = "gps-cdcl"
   solver-version = 1

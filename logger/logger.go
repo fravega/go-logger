@@ -8,26 +8,24 @@ import (
 	"os"
 )
 
-type Level uint32
-
-const (
-	Panic Level = iota
-	Fatal
-	Error
-	Warn
-	Info
-	Debug
-)
-
 const Production = "production"
 
 type logger struct {
 	logger *logrus.Logger
 }
 
+type entry struct {
+	entry *logrus.Entry
+}
+
 type Logger interface {
-	LogWithFields(Level, map[string]interface{}, string)
-	Log(Level, string)
+	WithFields(map[string]interface{}) Logger
+	Debug(string)
+	Info(string)
+	Warn(string)
+	Error(string)
+	Fatal(string)
+	Panic(string)
 }
 
 type Config struct {
@@ -39,59 +37,73 @@ type Config struct {
 	LogLevel        string
 }
 
-func NewLogger(config Config) Logger {
+func NewLogger(config *Config) Logger {
 	newLogger := &logger{
 		logger: logrus.StandardLogger(),
 	}
-	configure(&config)
+	configure(config)
 	return newLogger
 
 }
 
-func (l *logger) LogWithFields(level Level, fields map[string]interface{}, message string){
-	if strings.TrimSpace(message) == ""{
-		return
-	}
-
-	withFields := l.logger.WithFields(fields)
-
-	switch level {
-	case Panic:
-		withFields.Panic(message)
-	case Fatal:
-		withFields.Fatal(message)
-	case Error:
-		withFields.Error(message)
-	case Warn:
-		withFields.Warn(message)
-	case Info:
-		withFields.Info(message)
-	case Debug:
-		withFields.Debug(message)
+func (l *logger) WithFields(fields map[string]interface{}) Logger {
+	return &entry{
+		entry: l.logger.WithFields(fields),
 	}
 }
 
-func (l *logger) Log(level Level, message string){
-	if strings.TrimSpace(message) == ""{
-		return
-	}
-
-	switch level {
-	case Panic:
-		l.logger.Panic(message)
-	case Fatal:
-		l.logger.Fatal(message)
-	case Error:
-		l.logger.Error(message)
-	case Warn:
-		l.logger.Warn(message)
-	case Info:
-		l.logger.Info(message)
-	case Debug:
-		l.logger.Debug(message)
-	}
+func (l *logger) Debug(message string) {
+	l.logger.Debug(message)
 }
 
+func (l *logger) Info(message string) {
+	l.logger.Info(message)
+}
+
+func (l *logger) Warn(message string) {
+	l.logger.Warn(message)
+}
+
+func (l *logger) Error(message string) {
+	l.logger.Error(message)
+}
+
+func (l *logger) Fatal(message string) {
+	l.logger.Fatal(message)
+}
+
+func (l *logger) Panic(message string) {
+	l.logger.Panic(message)
+}
+
+func (e *entry) WithFields(fields map[string]interface{}) Logger {
+	e.entry.WithFields(fields)
+	return e
+}
+
+func (e *entry) Debug(message string) {
+	e.entry.Debug(message)
+}
+
+func (e *entry) Info(message string) {
+	e.entry.Info(message)
+}
+
+func (e *entry) Warn(message string) {
+	e.entry.Warn(message)
+}
+
+func (e *entry) Error(message string) {
+	e.entry.Error(message)
+}
+
+func (e *entry) Fatal(message string) {
+	e.entry.Fatal(message)
+}
+
+func (e *entry) Panic(message string) {
+	e.entry.Panic(message)
+}
 
 func configure(configuration *Config) {
 
@@ -122,7 +134,7 @@ func getFormatter(environment string) logrus.Formatter {
 
 func createHook(configuration *Config) logrus.Hook {
 	logstashServer := configuration.LogstashServer
-	if logstashServer == "" {
+	if strings.TrimSpace(logstashServer) == "" {
 		return nil
 	}
 
@@ -136,7 +148,7 @@ func createHook(configuration *Config) logrus.Hook {
 		return nil
 	}
 
-	hook.ReconnectBaseDelay = time.Second // Wait for one second before first reconnect.
+	hook.ReconnectBaseDelay = time.Second
 	hook.ReconnectDelayMultiplier = 2
 	hook.MaxReconnectRetries = 10
 
