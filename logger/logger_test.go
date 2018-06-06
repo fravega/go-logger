@@ -10,10 +10,13 @@ import (
 func TestLogger_Log(t *testing.T) {
 
 	config := &Config{
-		LogLevel:"DEBUG",
-		EnvironmentName:"TEST",
-		ServiceName:"LOG_TEST",
-		AppName:"GOLANG-LOGGER",
+		LogLevel:        "DEBUG",
+		EnvironmentName: "TEST",
+		ServiceName:     "LOG_TEST",
+		AppName:         "GOLANG-LOGGER",
+		DefaultFields: map[string]interface{}{
+			"customField": 1,
+		},
 	}
 
 	logger := New(config)
@@ -24,7 +27,15 @@ func TestLogger_Log(t *testing.T) {
 
 	logger.Debug("Hola Logger")
 
-	if !strings.Contains(firstLog.String(), "Hola Logger"){
+	firstLogResult := firstLog.String()
+
+	println("first: " + firstLogResult)
+
+	if !strings.Contains(firstLogResult, "Hola Logger") {
+		t.Fail()
+	}
+
+	if !strings.Contains(firstLogResult, "customField=1") {
 		t.Fail()
 	}
 
@@ -45,24 +56,40 @@ func TestLogger_Log(t *testing.T) {
 
 	secondLogResult := secondLog.String()
 
-	println("second: "+secondLogResult)
+	println("second: " + secondLogResult)
 
-	if !strings.Contains(secondLogResult,"num=2"){
+	if !strings.Contains(secondLogResult, "num=2") {
 		println("Fail on num")
 		t.Fail()
 	}
 
-	if !strings.Contains(secondLogResult,"obj=\"{Name}\""){
+	if !strings.Contains(secondLogResult, "obj=\"{Name}\"") {
 		println("Fail on obj")
 		t.Fail()
 	}
 
-	if !strings.Contains(secondLogResult,"text=Text"){
+	if !strings.Contains(secondLogResult, "text=Text") {
 		println("Fail on text")
 		t.Fail()
 	}
 
 	emptyFields := make(map[string]interface{})
 
+	var thirdLog bytes.Buffer
+
+	logrus.SetOutput(&thirdLog)
+
 	logger.WithFields(emptyFields).Debug("Hola Logger")
+
+	thirdLogResult := thirdLog.String()
+
+	println("third: " + thirdLogResult)
+
+	if !strings.Contains(firstLogResult, "Hola Logger") {
+		t.Fail()
+	}
+
+	if !strings.Contains(firstLogResult, "customField=1") {
+		t.Fail()
+	}
 }

@@ -11,11 +11,13 @@ import (
 const Production = "production"
 
 type logger struct {
-	logger *logrus.Logger
+	logger  *logrus.Logger
+	dFields map[string]interface{}
 }
 
 type entry struct {
-	entry *logrus.Entry
+	entry   *logrus.Entry
+	dFields map[string]interface{}
 }
 
 type Logger interface {
@@ -35,11 +37,13 @@ type Config struct {
 	LogstashServer  string
 	LogstashPort    string
 	LogLevel        string
+	DefaultFields   map[string]interface{}
 }
 
 func New(config *Config) Logger {
 	newLogger := &logger{
-		logger: logrus.StandardLogger(),
+		logger:  logrus.StandardLogger(),
+		dFields: config.DefaultFields,
 	}
 	configure(config)
 	return newLogger
@@ -47,62 +51,77 @@ func New(config *Config) Logger {
 }
 
 func (l *logger) WithFields(fields map[string]interface{}) Logger {
+	var allFields = make(map[string]interface{}, len(fields)+len(l.dFields))
+	for k, v := range l.dFields {
+		allFields[k] = v
+	}
+	for k, v := range fields {
+		allFields[k] = v
+	}
 	return &entry{
-		entry: l.logger.WithFields(fields),
+		entry:   l.logger.WithFields(allFields),
+		dFields: l.dFields,
 	}
 }
 
 func (l *logger) Debug(message ...interface{}) {
-	l.logger.Debug(message)
+	l.logger.WithFields(l.dFields).Debug(message)
 }
 
 func (l *logger) Info(message ...interface{}) {
-	l.logger.Info(message)
+	l.logger.WithFields(l.dFields).Info(message)
 }
 
 func (l *logger) Warn(message ...interface{}) {
-	l.logger.Warn(message)
+	l.logger.WithFields(l.dFields).Warn(message)
 }
 
 func (l *logger) Error(message ...interface{}) {
-	l.logger.Error(message)
+	l.logger.WithFields(l.dFields).Error(message)
 }
 
 func (l *logger) Fatal(message ...interface{}) {
-	l.logger.Fatal(message)
+	l.logger.WithFields(l.dFields).Fatal(message)
 }
 
 func (l *logger) Panic(message ...interface{}) {
-	l.logger.Panic(message)
+	l.logger.WithFields(l.dFields).Panic(message)
 }
 
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
+	var allFields = make(map[string]interface{}, len(fields)+len(e.dFields))
+	for k, v := range e.dFields {
+		allFields[k] = v
+	}
+	for k, v := range fields {
+		allFields[k] = v
+	}
 	e.entry.WithFields(fields)
 	return e
 }
 
 func (e *entry) Debug(message ...interface{}) {
-	e.entry.Debug(message)
+	e.entry.WithFields(e.dFields).Debug(message)
 }
 
 func (e *entry) Info(message ...interface{}) {
-	e.entry.Info(message)
+	e.entry.WithFields(e.dFields).Info(message)
 }
 
 func (e *entry) Warn(message ...interface{}) {
-	e.entry.Warn(message)
+	e.entry.WithFields(e.dFields).Warn(message)
 }
 
 func (e *entry) Error(message ...interface{}) {
-	e.entry.Error(message)
+	e.entry.WithFields(e.dFields).Error(message)
 }
 
 func (e *entry) Fatal(message ...interface{}) {
-	e.entry.Fatal(message)
+	e.entry.WithFields(e.dFields).Fatal(message)
 }
 
 func (e *entry) Panic(message ...interface{}) {
-	e.entry.Panic(message)
+	e.entry.WithFields(e.dFields).Panic(message)
 }
 
 func configure(configuration *Config) {
