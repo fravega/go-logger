@@ -20,12 +20,12 @@ type entry struct {
 
 type Logger interface {
 	WithFields(map[string]interface{}) Logger
-	Debug(string)
-	Info(string)
-	Warn(string)
-	Error(string)
-	Fatal(string)
-	Panic(string)
+	Debug(...interface{})
+	Info(...interface{})
+	Warn(...interface{})
+	Error(...interface{})
+	Fatal(...interface{})
+	Panic(...interface{})
 }
 
 type Config struct {
@@ -52,27 +52,27 @@ func (l *logger) WithFields(fields map[string]interface{}) Logger {
 	}
 }
 
-func (l *logger) Debug(message string) {
+func (l *logger) Debug(message ...interface{}) {
 	l.logger.Debug(message)
 }
 
-func (l *logger) Info(message string) {
+func (l *logger) Info(message ...interface{}) {
 	l.logger.Info(message)
 }
 
-func (l *logger) Warn(message string) {
+func (l *logger) Warn(message ...interface{}) {
 	l.logger.Warn(message)
 }
 
-func (l *logger) Error(message string) {
+func (l *logger) Error(message ...interface{}) {
 	l.logger.Error(message)
 }
 
-func (l *logger) Fatal(message string) {
+func (l *logger) Fatal(message ...interface{}) {
 	l.logger.Fatal(message)
 }
 
-func (l *logger) Panic(message string) {
+func (l *logger) Panic(message ...interface{}) {
 	l.logger.Panic(message)
 }
 
@@ -81,27 +81,27 @@ func (e *entry) WithFields(fields map[string]interface{}) Logger {
 	return e
 }
 
-func (e *entry) Debug(message string) {
+func (e *entry) Debug(message ...interface{}) {
 	e.entry.Debug(message)
 }
 
-func (e *entry) Info(message string) {
+func (e *entry) Info(message ...interface{}) {
 	e.entry.Info(message)
 }
 
-func (e *entry) Warn(message string) {
+func (e *entry) Warn(message ...interface{}) {
 	e.entry.Warn(message)
 }
 
-func (e *entry) Error(message string) {
+func (e *entry) Error(message ...interface{}) {
 	e.entry.Error(message)
 }
 
-func (e *entry) Fatal(message string) {
+func (e *entry) Fatal(message ...interface{}) {
 	e.entry.Fatal(message)
 }
 
-func (e *entry) Panic(message string) {
+func (e *entry) Panic(message ...interface{}) {
 	e.entry.Panic(message)
 }
 
