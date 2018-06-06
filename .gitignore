@@ -1,6 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
-.vendor/
+vendor/
 *.iws
 out/
 .idea_modules/
