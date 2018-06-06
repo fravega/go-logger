@@ -1,23 +1,26 @@
 package logger
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/FactomProject/logrustash"
-	"time"
-	"strings"
+	"github.com/sirupsen/logrus"
+	"log"
 	"os"
+	"strings"
+	"time"
 )
 
-const Production = "production"
+const production = "production"
 
 type logger struct {
-	logger  *logrus.Logger
-	dFields map[string]interface{}
+	logger      *logrus.Logger
+	serviceName string
+	dFields     map[string]interface{}
 }
 
 type entry struct {
-	entry   *logrus.Entry
-	dFields map[string]interface{}
+	entry       *logrus.Entry
+	serviceName string
+	dFields     map[string]interface{}
 }
 
 type Logger interface {
@@ -32,7 +35,6 @@ type Logger interface {
 
 type Config struct {
 	ServiceName     string
-	AppName         string
 	EnvironmentName string
 	LogstashServer  string
 	LogstashPort    string
@@ -41,26 +43,35 @@ type Config struct {
 }
 
 func New(config *Config) Logger {
+	validate(config)
 	newLogger := &logger{
-		logger:  logrus.StandardLogger(),
-		dFields: config.DefaultFields,
+		logger:      logrus.StandardLogger(),
+		serviceName: config.ServiceName,
+		dFields:     config.DefaultFields,
 	}
 	configure(config)
 	return newLogger
 
 }
+func validate(config *Config) {
+	if strings.TrimSpace(config.ServiceName) == "" {
+		log.Fatal("Required attribute 'ServiceName' missing on logger config")
+	}
+}
 
 func (l *logger) WithFields(fields map[string]interface{}) Logger {
-	var allFields = make(map[string]interface{}, len(fields)+len(l.dFields))
+	var allFields = make(map[string]interface{}, len(fields)+len(l.dFields)+1)
 	for k, v := range l.dFields {
 		allFields[k] = v
 	}
 	for k, v := range fields {
 		allFields[k] = v
 	}
+	allFields["service_name"] = l.serviceName
 	return &entry{
-		entry:   l.logger.WithFields(allFields),
-		dFields: l.dFields,
+		entry:       l.logger.WithFields(allFields),
+		serviceName: l.serviceName,
+		dFields:     l.dFields,
 	}
 }
 
@@ -96,6 +107,7 @@ func (e *entry) WithFields(fields map[string]interface{}) Logger {
 	for k, v := range fields {
 		allFields[k] = v
 	}
+	allFields["service_name"] = e.serviceName
 	e.entry.WithFields(fields)
 	return e
 }
@@ -145,7 +157,7 @@ func getLevel(logLevel string) logrus.Level {
 func getFormatter(environment string) logrus.Formatter {
 	envType := valueOrDefault(environment, "development")
 
-	if envType == Production {
+	if envType == production {
 		return &logrus.JSONFormatter{}
 	}
 	return &logrus.TextFormatter{}
@@ -158,10 +170,9 @@ func createHook(configuration *Config) logrus.Hook {
 	}
 
 	logstashPort := valueOrDefault(configuration.LogstashPort, "5000")
-	appName := valueOrDefault(configuration.AppName, configuration.ServiceName)
 	address := logstashServer + ":" + logstashPort
 
-	hook, err := logrustash.NewAsyncHook("tcp", address, appName)
+	hook, err := logrustash.NewAsyncHook("tcp", address, configuration.ServiceName)
 
 	if err != nil {
 		return nil
