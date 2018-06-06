@@ -13,7 +13,6 @@ func TestLogger_Log(t *testing.T) {
 		LogLevel:        "DEBUG",
 		EnvironmentName: "TEST",
 		ServiceName:     "LOG_TEST",
-		AppName:         "GOLANG-LOGGER",
 		DefaultFields: map[string]interface{}{
 			"customField": 1,
 		},

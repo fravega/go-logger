@@ -60,80 +60,76 @@ func validate(config *Config) {
 }
 
 func (l *logger) WithFields(fields map[string]interface{}) Logger {
-	var allFields = make(map[string]interface{}, len(fields)+len(l.dFields)+1)
-	for k, v := range l.dFields {
-		allFields[k] = v
-	}
-	for k, v := range fields {
-		allFields[k] = v
-	}
-	allFields["service_name"] = l.serviceName
 	return &entry{
-		entry:       l.logger.WithFields(allFields),
+		entry:       l.logger.WithFields(collectFields(l.dFields, fields, l.serviceName)),
 		serviceName: l.serviceName,
 		dFields:     l.dFields,
 	}
 }
 
 func (l *logger) Debug(message ...interface{}) {
-	l.logger.WithFields(l.dFields).Debug(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{}, l.serviceName)).Debug(message)
 }
 
 func (l *logger) Info(message ...interface{}) {
-	l.logger.WithFields(l.dFields).Info(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{}, l.serviceName)).Info(message)
 }
 
 func (l *logger) Warn(message ...interface{}) {
-	l.logger.WithFields(l.dFields).Warn(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{}, l.serviceName)).Warn(message)
 }
 
 func (l *logger) Error(message ...interface{}) {
-	l.logger.WithFields(l.dFields).Error(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{}, l.serviceName)).Error(message)
 }
 
 func (l *logger) Fatal(message ...interface{}) {
-	l.logger.WithFields(l.dFields).Fatal(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{}, l.serviceName)).Fatal(message)
 }
 
 func (l *logger) Panic(message ...interface{}) {
-	l.logger.WithFields(l.dFields).Panic(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{}, l.serviceName)).Panic(message)
 }
 
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
-	var allFields = make(map[string]interface{}, len(fields)+len(e.dFields))
-	for k, v := range e.dFields {
-		allFields[k] = v
-	}
-	for k, v := range fields {
-		allFields[k] = v
-	}
-	allFields["service_name"] = e.serviceName
-	e.entry.WithFields(fields)
+	e.entry.WithFields(collectFields(e.dFields, fields, e.serviceName))
 	return e
 }
 
 func (e *entry) Debug(message ...interface{}) {
-	e.entry.WithFields(e.dFields).Debug(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{}, e.serviceName)).Debug(message)
 }
 
 func (e *entry) Info(message ...interface{}) {
-	e.entry.WithFields(e.dFields).Info(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{}, e.serviceName)).Info(message)
 }
 
 func (e *entry) Warn(message ...interface{}) {
-	e.entry.WithFields(e.dFields).Warn(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{}, e.serviceName)).Warn(message)
 }
 
 func (e *entry) Error(message ...interface{}) {
-	e.entry.WithFields(e.dFields).Error(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{}, e.serviceName)).Error(message)
 }
 
 func (e *entry) Fatal(message ...interface{}) {
-	e.entry.WithFields(e.dFields).Fatal(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{}, e.serviceName)).Fatal(message)
 }
 
 func (e *entry) Panic(message ...interface{}) {
-	e.entry.WithFields(e.dFields).Panic(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{}, e.serviceName)).Panic(message)
+}
+
+func collectFields(a map[string]interface{}, b map[string]interface{}, serviceName string) map[string]interface{} {
+	var allFields = make(map[string]interface{}, len(a)+len(b)+1)
+	for k, v := range a {
+		allFields[k] = v
+	}
+	for k, v := range b {
+		allFields[k] = v
+	}
+	allFields["service_name"] = serviceName
+	return allFields
 }
 
 func configure(configuration *Config) {
