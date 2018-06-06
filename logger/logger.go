@@ -37,7 +37,7 @@ type Config struct {
 	LogLevel        string
 }
 
-func NewLogger(config *Config) Logger {
+func New(config *Config) Logger {
 	newLogger := &logger{
 		logger: logrus.StandardLogger(),
 	}

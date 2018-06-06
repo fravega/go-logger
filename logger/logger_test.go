@@ -16,7 +16,7 @@ func TestLogger_Log(t *testing.T) {
 		AppName:"GOLANG-LOGGER",
 	}
 
-	logger := NewLogger(config)
+	logger := New(config)
 
 	var firstLog bytes.Buffer
 
