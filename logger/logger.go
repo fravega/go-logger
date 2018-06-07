@@ -11,6 +11,9 @@ import (
 
 const production = "production"
 
+//Alias for map used in withfields methods
+type Fields map[string]interface{}
+
 type logger struct {
 	logger      *logrus.Logger
 	serviceName string
