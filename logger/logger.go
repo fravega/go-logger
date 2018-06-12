@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const production = "production"
+const production = "PRODUCTION"
 
 //Alias for map used in withfields methods
 type Fields map[string]interface{}
@@ -156,7 +156,7 @@ func getLevel(logLevel string) logrus.Level {
 func getFormatter(environment string) logrus.Formatter {
 	envType := valueOrDefault(environment, "development")
 
-	if envType == production {
+	if strings.ToUpper(envType) == production {
 		return &logrus.JSONFormatter{}
 	}
 	return &logrus.TextFormatter{}
