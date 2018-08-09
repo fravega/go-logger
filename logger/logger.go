@@ -1,12 +1,10 @@
 package logger
 
 import (
-	"github.com/FactomProject/logrustash"
 	"github.com/sirupsen/logrus"
 	"log"
 	"os"
 	"strings"
-	"time"
 )
 
 const production = "PRODUCTION"
@@ -39,8 +37,6 @@ type Logger interface {
 type Config struct {
 	ServiceName     string
 	EnvironmentName string
-	LogstashServer  string
-	LogstashPort    string
 	LogLevel        string
 	DefaultFields   map[string]interface{}
 }
@@ -136,13 +132,8 @@ func collectFields(a map[string]interface{}, b map[string]interface{}, serviceNa
 }
 
 func configure(configuration *Config) {
-
 	logrus.SetLevel(getLevel(configuration.LogLevel))
 	logrus.SetFormatter(getFormatter(configuration.EnvironmentName))
-
-	if hook := createHook(configuration); hook != nil {
-		logrus.AddHook(hook)
-	}
 }
 
 func getLevel(logLevel string) logrus.Level {
@@ -160,28 +151,6 @@ func getFormatter(environment string) logrus.Formatter {
 		return &logrus.JSONFormatter{}
 	}
 	return &logrus.TextFormatter{}
-}
-
-func createHook(configuration *Config) logrus.Hook {
-	logstashServer := configuration.LogstashServer
-	if strings.TrimSpace(logstashServer) == "" {
-		return nil
-	}
-
-	logstashPort := valueOrDefault(configuration.LogstashPort, "5000")
-	address := logstashServer + ":" + logstashPort
-
-	hook, err := logrustash.NewAsyncHook("tcp", address, configuration.ServiceName)
-
-	if err != nil {
-		return nil
-	}
-
-	hook.ReconnectBaseDelay = time.Second
-	hook.ReconnectDelayMultiplier = 2
-	hook.MaxReconnectRetries = 10
-
-	return hook
 }
 
 func valueOrDefault(name string, defValue string) string {
