@@ -26,12 +26,8 @@
 
 
 [[constraint]]
-  name = "github.com/FactomProject/logrustash"
-  branch = "master"
-
-[[constraint]]
   name = "github.com/sirupsen/logrus"
-  version = "1.0.5"
+  version = "1.0.6"
 
 [prune]
   go-tests = true
