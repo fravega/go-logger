@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const production = "PRODUCTION"
+const json = "JSON"
 
 //Alias for map used in withfields methods
 type Fields map[string]interface{}
@@ -38,6 +38,7 @@ type Config struct {
 	ServiceName     string
 	EnvironmentName string
 	LogLevel        string
+	Format          string
 	DefaultFields   map[string]interface{}
 }
 
@@ -133,7 +134,7 @@ func collectFields(a map[string]interface{}, b map[string]interface{}, serviceNa
 
 func configure(configuration *Config) {
 	logrus.SetLevel(getLevel(configuration.LogLevel))
-	logrus.SetFormatter(getFormatter(configuration.EnvironmentName))
+	logrus.SetFormatter(getFormatter(configuration.Format))
 }
 
 func getLevel(logLevel string) logrus.Level {
@@ -144,10 +145,10 @@ func getLevel(logLevel string) logrus.Level {
 	return level
 }
 
-func getFormatter(environment string) logrus.Formatter {
-	envType := valueOrDefault(environment, "development")
+func getFormatter(format string) logrus.Formatter {
+	envType := valueOrDefault(format, "plain")
 
-	if strings.ToUpper(envType) == production {
+	if strings.ToUpper(envType) == json {
 		return &logrus.JSONFormatter{}
 	}
 	return &logrus.TextFormatter{}
