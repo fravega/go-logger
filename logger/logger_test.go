@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"bytes"
 	"strings"
+	"os"
 )
 
 func TestLogger_Log(t *testing.T) {
@@ -91,4 +92,58 @@ func TestLogger_Log(t *testing.T) {
 	if !strings.Contains(firstLogResult, "customField=1") {
 		t.Fail()
 	}
+}
+
+func TestLogger_GetDefaultLogger(t *testing.T) {
+
+	os.Setenv("SERVICE_NAME", "katalog-service")
+	os.Setenv("LOG_LEVEL", "INFO")
+
+	logger := GetDefaultLogger()
+
+	if logger != GetDefaultLogger() {
+		t.Fail()
+	}
+
+	var firstLog bytes.Buffer
+
+	logrus.SetOutput(&firstLog)
+
+	logger.Info("First message")
+
+	firstLogResult := firstLog.String()
+
+	println("first: " + firstLogResult)
+
+	if !strings.Contains(firstLogResult, "service_name=katalog-service") {
+		t.Fail()
+	}
+
+	var secondLog bytes.Buffer
+
+	logrus.SetOutput(&secondLog)
+
+	logger.Debug("Second message")
+
+	secondLogResult := secondLog.String()
+
+	println("second: " + secondLogResult)
+
+	if secondLogResult != "" {
+		t.Fail()
+	}
+
+	fields := make(map[string]interface{})
+	fields["mode"] = "application"
+
+	logger.WithFields(fields).Warn("Second message")
+
+	thirdLogResult := secondLog.String()
+
+	println("third: " + thirdLogResult)
+
+	if !strings.Contains(thirdLogResult, "mode=application") {
+		t.Fail()
+	}
+
 }
