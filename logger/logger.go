@@ -93,27 +93,27 @@ func (l *logger) Panic(message ...interface{}) {
 }
 
 func (l *logger) Debugf(format string, message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Debugf(format, message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Debugf(format, message...)
 }
 
 func (l *logger) Infof(format string, message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Infof(format, message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Infof(format, message...)
 }
 
 func (l *logger) Warnf(format string, message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Warnf(format, message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Warnf(format, message...)
 }
 
 func (l *logger) Errorf(format string, message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Errorf(format, message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Errorf(format, message...)
 }
 
 func (l *logger) Fatalf(format string, message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Fatalf(format, message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Fatalf(format, message...)
 }
 
 func (l *logger) Panicf(format string, message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panicf(format, message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
@@ -146,27 +146,27 @@ func (e *entry) Panic(message ...interface{}) {
 }
 
 func (e *entry) Debugf(format string, message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Debugf(format, message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Debugf(format, message...)
 }
 
 func (e *entry) Infof(format string, message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Infof(format, message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Infof(format, message...)
 }
 
 func (e *entry) Warnf(format string, message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Warnf(format, message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Warnf(format, message...)
 }
 
 func (e *entry) Errorf(format string, message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Errorf(format, message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Errorf(format, message...)
 }
 
 func (e *entry) Fatalf(format string, message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Fatalf(format, message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Fatalf(format, message...)
 }
 
 func (e *entry) Panicf(format string, message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panicf(format, message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
 func collectFields(a map[string]interface{}, b map[string]interface{}) map[string]interface{} {
