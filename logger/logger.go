@@ -39,7 +39,7 @@ type Config struct {
 	ServiceName     string
 	EnvironmentName string
 	LogLevel        string
-	Format          string
+	LogFormat       string
 	DefaultFields   map[string]interface{}
 }
 
@@ -128,7 +128,7 @@ func collectFields(a map[string]interface{}, b map[string]interface{}) map[strin
 
 func configure(configuration *Config) {
 	logrus.SetLevel(getLevel(configuration.LogLevel))
-	logrus.SetFormatter(getFormatter(configuration.Format))
+	logrus.SetFormatter(getFormatter(configuration.LogFormat))
 }
 
 func getLevel(logLevel string) logrus.Level {
@@ -149,7 +149,7 @@ func getFormatter(format string) logrus.Formatter {
 }
 
 func valueOrDefault(name string, defValue string) string {
-	v := strings.TrimSpace(os.Getenv(name))
+	v := strings.TrimSpace(name)
 
 	if v == "" {
 		return defValue
@@ -170,6 +170,7 @@ func buildDefaultLogger() Logger {
 		ServiceName:     os.Getenv("SERVICE_NAME"),
 		EnvironmentName: os.Getenv("ENVIRONMENT"),
 		LogLevel:        os.Getenv("LOG_LEVEL"),
+		LogFormat:       os.Getenv("LOG_FORMAT"),
 	}
 	return New(config)
 }
