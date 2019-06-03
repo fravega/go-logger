@@ -1,15 +1,16 @@
 package logger
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 const json = "JSON"
 
-//Alias for map used in withfields methods
+//Fields is an alias for map used in withfields methods
 type Fields map[string]interface{}
 
 type logger struct {
@@ -25,6 +26,7 @@ type entry struct {
 	dFields map[string]interface{}
 }
 
+// Logger represents an entity that writes logs with custom fields
 type Logger interface {
 	WithFields(map[string]interface{}) Logger
 	Debug(...interface{})
@@ -41,6 +43,7 @@ type Logger interface {
 	Panicf(string, ...interface{})
 }
 
+// Config is used to configure the Logger
 type Config struct {
 	ServiceName     string
 	EnvironmentName string
@@ -49,6 +52,7 @@ type Config struct {
 	DefaultFields   map[string]interface{}
 }
 
+// New creates a new Logger from some configuration
 func New(config *Config) Logger {
 	fields := addIfNotEmpty(config.DefaultFields, "service_name", config.ServiceName)
 	fields = addIfNotEmpty(fields, "environment", config.EnvironmentName)
@@ -69,27 +73,27 @@ func (l *logger) WithFields(fields map[string]interface{}) Logger {
 }
 
 func (l *logger) Debug(message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Debug(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Debug(message...)
 }
 
 func (l *logger) Info(message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Info(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Info(message...)
 }
 
 func (l *logger) Warn(message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Warn(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Warn(message...)
 }
 
 func (l *logger) Error(message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Error(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Error(message...)
 }
 
 func (l *logger) Fatal(message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Fatal(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Fatal(message...)
 }
 
 func (l *logger) Panic(message ...interface{}) {
-	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panic(message)
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panic(message...)
 }
 
 func (l *logger) Debugf(format string, message ...interface{}) {
@@ -117,32 +121,34 @@ func (l *logger) Panicf(format string, message ...interface{}) {
 }
 
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
-	e.entry.WithFields(collectFields(e.dFields, fields))
-	return e
+	return &entry{
+		entry:   e.entry.WithFields(collectFields(e.dFields, fields)),
+		dFields: e.dFields,
+	}
 }
 
 func (e *entry) Debug(message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Debug(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Debug(message...)
 }
 
 func (e *entry) Info(message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Info(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Info(message...)
 }
 
 func (e *entry) Warn(message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Warn(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Warn(message...)
 }
 
 func (e *entry) Error(message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Error(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Error(message...)
 }
 
 func (e *entry) Fatal(message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Fatal(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Fatal(message...)
 }
 
 func (e *entry) Panic(message ...interface{}) {
-	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panic(message)
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panic(message...)
 }
 
 func (e *entry) Debugf(format string, message ...interface{}) {
@@ -207,11 +213,11 @@ func valueOrDefault(name string, defValue string) string {
 
 	if v == "" {
 		return defValue
-	} else {
-		return v
 	}
+	return v
 }
 
+// GetDefaultLogger builds a Logger with a configuration built from env vars
 func GetDefaultLogger() Logger {
 	once.Do(func() {
 		defaultLogger = buildDefaultLogger()
@@ -237,7 +243,6 @@ func addIfNotEmpty(fields map[string]interface{}, key string, value string) map[
 		}
 		newFields[key] = value
 		return newFields
-	} else {
-		return fields
 	}
+	return fields
 }
