@@ -121,8 +121,10 @@ func (l *logger) Panicf(format string, message ...interface{}) {
 }
 
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
-	e.entry = e.entry.WithFields(collectFields(e.dFields, fields))
-	return e
+	return &entry{
+		entry:   e.entry.WithFields(collectFields(e.dFields, fields)),
+		dFields: e.dFields,
+	}
 }
 
 func (e *entry) Debug(message ...interface{}) {
