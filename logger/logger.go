@@ -123,8 +123,9 @@ func (l *logger) Panicf(format string, message ...interface{}) {
 	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
+// From returns a new logger that contains the values from a given context
 func (l *logger) From(ctx context.Context) Logger {
-	return From(ctx, l)
+	return from(ctx, l)
 }
 
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
@@ -182,8 +183,9 @@ func (e *entry) Panicf(format string, message ...interface{}) {
 	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
+// From returns a new logger from an entry that contains the values from a given context
 func (e *entry) From(ctx context.Context) Logger {
-	return From(ctx, e)
+	return from(ctx, e)
 }
 
 func collectFields(a map[string]interface{}, b map[string]interface{}) map[string]interface{} {
@@ -228,8 +230,7 @@ func valueOrDefault(name string, defValue string) string {
 	return v
 }
 
-// From creates a new logger instance that contains the traceId field from a given context
-func From(ctx context.Context, baseLogger Logger) Logger {
+func from(ctx context.Context, baseLogger Logger) Logger {
 	if id :=  tracing.GetId(ctx); id != "" {
 		return baseLogger.WithFields(Fields{"traceId": id})
 	}
