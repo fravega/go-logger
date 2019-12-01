@@ -278,13 +278,13 @@ func TestLogger_From(t *testing.T) {
 	traceId := uuid.New().String()
 	ctx := tracing.SetId(context.Background(), traceId)
 
-	config := buildDefaultConfig()
+	l := New(buildDefaultConfig())
 	msg := "sarasa"
 
 	var output bytes.Buffer
 	logrus.SetOutput(&output)
 
-	sut := From(ctx, New(config))
+	sut :=  l.From(ctx)
 
 	sut.Debugf(msg)
 

@@ -43,6 +43,7 @@ type Logger interface {
 	Errorf(string, ...interface{})
 	Fatalf(string, ...interface{})
 	Panicf(string, ...interface{})
+	From(context.Context) Logger
 }
 
 // Config is used to configure the Logger
@@ -122,6 +123,10 @@ func (l *logger) Panicf(format string, message ...interface{}) {
 	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
+func (l *logger) From(ctx context.Context) Logger {
+	return From(ctx, l)
+}
+
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
 	return &entry{
 		entry:   e.entry.WithFields(collectFields(e.dFields, fields)),
@@ -175,6 +180,10 @@ func (e *entry) Fatalf(format string, message ...interface{}) {
 
 func (e *entry) Panicf(format string, message ...interface{}) {
 	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panicf(format, message...)
+}
+
+func (e *entry) From(ctx context.Context) Logger {
+	return From(ctx, e)
 }
 
 func collectFields(a map[string]interface{}, b map[string]interface{}) map[string]interface{} {
