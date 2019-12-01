@@ -1,4 +1,4 @@
-module gitlab.com/fravega-it/arquitectura/ec-golang-logger
+module gitlab.com/fravega-it/arquitectura/ec-golang-logger/v2
 
 go 1.13
 
