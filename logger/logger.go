@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"context"
+	"github.com/fravega/go-tracing"
 	"os"
 	"strings"
 	"sync"
@@ -215,6 +217,14 @@ func valueOrDefault(name string, defValue string) string {
 		return defValue
 	}
 	return v
+}
+
+// From creates a new logger instance that contains the traceId field from a given context
+func From(ctx context.Context, baseLogger Logger) Logger {
+	if id :=  tracing.GetId(ctx); id != "" {
+		return baseLogger.WithFields(Fields{"traceId": id})
+	}
+	return baseLogger
 }
 
 // GetDefaultLogger builds a Logger with a configuration built from env vars
