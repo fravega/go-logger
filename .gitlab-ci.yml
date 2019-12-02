@@ -8,11 +8,11 @@ build:
   stage: build
   script:
     - go mod download
-    - go build ./logger
+    - go build ./...
   only:
     changes:
       - go*
-      - logger/**/*
+      - "*.go"
       - ".gitlab-ci.yml"
   tags:
     - build
@@ -27,7 +27,7 @@ test:
   only:
     changes:
       - go*
-      - logger/**/*
+      - "*.go"
       - ".gitlab-ci.yml"
   tags:
     - build

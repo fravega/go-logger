@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"context"
+	"github.com/fravega/go-tracing"
 	"os"
 	"strings"
 	"sync"
@@ -41,6 +43,7 @@ type Logger interface {
 	Errorf(string, ...interface{})
 	Fatalf(string, ...interface{})
 	Panicf(string, ...interface{})
+	From(context.Context) Logger
 }
 
 // Config is used to configure the Logger
@@ -120,6 +123,11 @@ func (l *logger) Panicf(format string, message ...interface{}) {
 	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
+// From returns a new logger that contains the values from a given context
+func (l *logger) From(ctx context.Context) Logger {
+	return from(ctx, l)
+}
+
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
 	return &entry{
 		entry:   e.entry.WithFields(collectFields(e.dFields, fields)),
@@ -175,6 +183,11 @@ func (e *entry) Panicf(format string, message ...interface{}) {
 	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panicf(format, message...)
 }
 
+// From returns a new logger from an entry that contains the values from a given context
+func (e *entry) From(ctx context.Context) Logger {
+	return from(ctx, e)
+}
+
 func collectFields(a map[string]interface{}, b map[string]interface{}) map[string]interface{} {
 	var allFields = make(map[string]interface{}, len(a)+len(b))
 	for k, v := range a {
@@ -215,6 +228,13 @@ func valueOrDefault(name string, defValue string) string {
 		return defValue
 	}
 	return v
+}
+
+func from(ctx context.Context, baseLogger Logger) Logger {
+	if id :=  tracing.GetId(ctx); id != "" {
+		return baseLogger.WithFields(Fields{"traceId": id})
+	}
+	return baseLogger
 }
 
 // GetDefaultLogger builds a Logger with a configuration built from env vars

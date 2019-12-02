@@ -2,7 +2,10 @@ package logger
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"github.com/fravega/go-tracing"
+	"github.com/google/uuid"
 	"os"
 	"reflect"
 	"strings"
@@ -269,5 +272,21 @@ func TestLogger_GetDefaultLogger(t *testing.T) {
 	if !strings.Contains(thirdLogResult, "mode=application") {
 		t.Fail()
 	}
+}
 
+func TestLogger_From(t *testing.T) {
+	traceId := uuid.New().String()
+	ctx := tracing.SetId(context.Background(), traceId)
+
+	l := New(buildDefaultConfig())
+	msg := "sarasa"
+
+	var output bytes.Buffer
+	logrus.SetOutput(&output)
+
+	sut :=  l.From(ctx)
+
+	sut.Debugf(msg)
+
+	assertForLogEntry(t, output.String(), msg, map[string]interface{}{"traceId": traceId})
 }
