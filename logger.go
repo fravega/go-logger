@@ -31,12 +31,14 @@ type entry struct {
 // Logger represents an entity that writes logs with custom fields
 type Logger interface {
 	WithFields(map[string]interface{}) Logger
+	Print(...interface{})
 	Debug(...interface{})
 	Info(...interface{})
 	Warn(...interface{})
 	Error(...interface{})
 	Fatal(...interface{})
 	Panic(...interface{})
+	Printf(string, ...interface{})
 	Debugf(string, ...interface{})
 	Infof(string, ...interface{})
 	Warnf(string, ...interface{})
@@ -65,7 +67,6 @@ func New(config *Config) Logger {
 	}
 	configure(config)
 	return newLogger
-
 }
 
 func (l *logger) WithFields(fields map[string]interface{}) Logger {
@@ -73,6 +74,10 @@ func (l *logger) WithFields(fields map[string]interface{}) Logger {
 		entry:   l.logger.WithFields(collectFields(l.dFields, fields)),
 		dFields: l.dFields,
 	}
+}
+
+func (l *logger) Print(message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Print(message...)
 }
 
 func (l *logger) Debug(message ...interface{}) {
@@ -97,6 +102,10 @@ func (l *logger) Fatal(message ...interface{}) {
 
 func (l *logger) Panic(message ...interface{}) {
 	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Panic(message...)
+}
+
+func (l *logger) Printf(format string, message ...interface{}) {
+	l.logger.WithFields(collectFields(l.dFields, map[string]interface{}{})).Printf(format, message...)
 }
 
 func (l *logger) Debugf(format string, message ...interface{}) {
@@ -125,7 +134,7 @@ func (l *logger) Panicf(format string, message ...interface{}) {
 
 // From returns a new logger that contains the values from a given context
 func (l *logger) From(ctx context.Context) Logger {
-	return from(ctx, l)
+	return from(ctx, &entry{l.logger.WithContext(ctx),l.dFields})
 }
 
 func (e *entry) WithFields(fields map[string]interface{}) Logger {
@@ -133,6 +142,10 @@ func (e *entry) WithFields(fields map[string]interface{}) Logger {
 		entry:   e.entry.WithFields(collectFields(e.dFields, fields)),
 		dFields: e.dFields,
 	}
+}
+
+func (e *entry) Print(message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Print(message...)
 }
 
 func (e *entry) Debug(message ...interface{}) {
@@ -157,6 +170,10 @@ func (e *entry) Fatal(message ...interface{}) {
 
 func (e *entry) Panic(message ...interface{}) {
 	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Panic(message...)
+}
+
+func (e *entry) Printf(format string, message ...interface{}) {
+	e.entry.WithFields(collectFields(e.dFields, map[string]interface{}{})).Printf(format, message...)
 }
 
 func (e *entry) Debugf(format string, message ...interface{}) {
@@ -185,7 +202,7 @@ func (e *entry) Panicf(format string, message ...interface{}) {
 
 // From returns a new logger from an entry that contains the values from a given context
 func (e *entry) From(ctx context.Context) Logger {
-	return from(ctx, e)
+	return from(ctx, &entry{e.entry.WithContext(ctx),e.dFields})
 }
 
 func collectFields(a map[string]interface{}, b map[string]interface{}) map[string]interface{} {
