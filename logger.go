@@ -2,11 +2,12 @@ package logger
 
 import (
 	"context"
-	"github.com/fravega/go-tracing"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/fravega/go-tracing"
 	"github.com/sirupsen/logrus"
 )
 
@@ -233,9 +234,9 @@ func getFormatter(format string) logrus.Formatter {
 	envType := valueOrDefault(format, "plain")
 
 	if strings.ToUpper(envType) == json {
-		return &logrus.JSONFormatter{}
+		return &logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano}
 	}
-	return &logrus.TextFormatter{}
+	return &logrus.TextFormatter{TimestampFormat: time.RFC3339Nano}
 }
 
 func valueOrDefault(name string, defValue string) string {
